@@ -1,0 +1,25 @@
+{
+    "levels": {
+        "1": {
+            "name": "Funny",
+            "description": ""
+        },
+        "2": {
+            "name": "What?",
+            "description": ""
+        },
+
+        "3": {
+            "name": "Well...",
+            "description": ""
+        }, 
+        "4": {
+            "name": "Sabotage",
+            "description": ""
+        },
+        "5": {
+            "name":"Hardcore",
+            "description": ""
+        }
+    }
+}
