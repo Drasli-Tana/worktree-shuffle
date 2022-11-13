@@ -10,6 +10,7 @@ import json as JS
 import random as RD
 import tkinter as TK
 import tkinter.filedialog as TF
+import tkinter.messagebox as TM
 import uuid as ID
 
 class Main(TK.Tk):
@@ -151,7 +152,24 @@ class Main(TK.Tk):
     def nuke(self):
         self.flattenOriginalTree(self.path.get())
         
-        if self.cursor.get() >= 3:
+        if self.cursor.get() == 1:
+            # Simply move files at the end
+            
+            os.makedirs(
+                os.path.join(
+                    self.path.get(),
+                    *self.newPath.get().split(" ")), 
+                exists_ok=True)
+            
+            for file in os.listdir(self.path.get()):
+                if self.isFile(file):
+                    os.rename(
+                        os.path.join(self.path.get(), file),
+                        os.path.join(self.path.get(),
+                                     *self.newPath.get().split(" "),
+                                     file))
+        
+        elif self.cursor.get() >= 3:
             # The files should be renamed
             files = [
                 file for file in os.listdir(self.path.get())
@@ -192,7 +210,7 @@ class Main(TK.Tk):
                 for i in range(RD.randrange(
                     50, 50 + 10 ** self.randomLength.get())):
                     filename = (
-                        self.newName.get() + len(files)
+                        self.newName.get() + str(len(files))
                         if (self.newName.get() and
                             self.cursor.get() < 5) 
                         else str(ID.uuid4()))
@@ -207,49 +225,44 @@ class Main(TK.Tk):
                             abs(RD.randint(-2000, 2000) +
                             int(extensions[extension]))))
         
-        if self.cursor.get() == 1:
-            # Simply move files at the end
+        if self.cursor.get() < 5 and self.cursor.get() > 1:
+            paths = ([
+                os.path.join(
+                    *[dirName
+                      for dirName in self.newPath.get().split(" ")
+                      if dirName])]
+                if self.newPath.get().strip()
+                else [str(ID.uuid4()) for _ in range(
+                    self.randomLength.get())])
+            os.makedirs(os.path.join(self.path.get(), *paths))
+            
             for file in os.listdir(self.path.get()):
-                os.rename(
-                    os.path.join(self.path.get(), file),
-                    os.path.join(self.path.get(),
-                                 self.newPath.get(), file))
-        
-        else:
-            # Spread files
-            if self.cursor.get() < 5:
-                paths = ([
-                    os.path.join(
-                        *[dirName
-                          for dirName in self.newPath.get().split(" ")
-                          if dirName])]
-                    if self.newPath.get().strip()
-                    else [str(ID.uuid4()) for _ in range(
-                        self.randomLength.get())])
-                os.makedirs(os.path.join(self.path.get(), *paths))
+                pathList = ["."] + self.newPath.get().split(" ")
+                level = RD.randrange(0, len(pathList))
                 
-                for file in os.listdir(self.path.get()):
-                    pathList = ["."] + self.newPath.get().split(" ")
-                    level = RD.randrange(0, len(pathList))
-                    
+                if self.isFile(file):
                     os.rename(
                         os.path.join(self.path.get(), file),
                         os.path.join(
-                            self.path.get(), *pathList[:level], file))
-                
-            else: 
-                # Mode 5, répartition aléatoire
-                self.subFolderTree(self.path.get(), self.randomLength.get())
-                paths = self.folderLevel(
-                    self.path.get(),
-                    RD.randint(0, self.randomLength.get()))
-                
-                for file in os.listdir(self.path.get()):
-                    if self.isFile(file):
-                        os.rename(
-                            os.path.join(self.path.get(), file),
-                            os.path.join(RD.choice(paths), file))
-               
+                            self.path.get(),
+                            *pathList[:level], file))
+            
+        elif self.cursor.get() == 5: 
+            # Mode 5, répartition aléatoire
+            self.subFolderTree(
+                self.path.get(), self.randomLength.get())
+            paths = self.folderLevel(
+                self.path.get(),
+                RD.randint(0, self.randomLength.get()))
+            
+            for file in os.listdir(self.path.get()):
+                if self.isFile(file):
+                    os.rename(
+                        os.path.join(self.path.get(), file),
+                        os.path.join(RD.choice(paths), file))
+        
+        TM.showinfo("Finished", "Operation successful")
+        
     def isFile(self, *file):
         return os.path.isfile(os.path.join(
             self.path.get(), *file))
@@ -276,7 +289,7 @@ class Main(TK.Tk):
         if level > 0:
             for _ in range(10):
                 folder = os.path.join(basePath, str(ID.uuid4()))
-                os.makedirs(folder)
+                os.makedirs(folder, exists_ok=True)
                 self.subFolderTree(folder, level-1)
         
     def flattenOriginalTree(self, mainPath, path=""):
@@ -354,7 +367,9 @@ class Main(TK.Tk):
         self.randomFields.nametowidget("!checkbutton").config(
             state=(TK.DISABLED if self.cursor.get() < 3
                    else TK.NORMAL))
-    
+        self.randomFields.nametowidget("!label2").config(
+                state=(TK.DISABLED if self.cursor.get() < 3
+                       else TK.NORMAL))
     def modeUpdate(self):
         self.description.set(self.config.get(
             str(self.cursor.get())).get("description"))
