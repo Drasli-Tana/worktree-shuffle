@@ -2,7 +2,7 @@
     "levels": {
         "1": {
             "name": "Funny",
-            "description": "Simply create a subfolder's tree and move each files in the current folder at the end of the chain. No file renaming nor random spreading."
+            "description": "Simply creates a subfolder's tree and move each files in the current folder at the end of the chain. No file renaming nor random spreading."
         },
         "2": {
             "name": "What?",
@@ -15,7 +15,7 @@
         }, 
         "4": {
             "name": "Sabotage",
-            "description": "Create subfolder's tree, rename files if relevant and add new ones matching prior file' file extension."
+            "description": "Create subfolder's tree, rename files if relevant and add new ones matching prior file's file extension."
         },
         "5": {
             "name":"Hardcore",
